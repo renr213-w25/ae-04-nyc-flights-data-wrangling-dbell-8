@@ -1,30 +1,32 @@
 ---
 title: "AE 04: NYC flights + data wrangling"
+author: "David Bell"
+format: pdf
 ---
 
-```{r}
+```{r R Load}
 #| label: load-packages
 #| message: false
 
 library(tidyverse)
 library(nycflights13)
+
 ```
 
 ## Exercise 1
 
 **Your turn:** Fill in the blanks:
 
-The `flights` data frame has \_\_\_ rows.
-Each row represents a \_\_\_.
+The `flights` data frame has [**336,776 rows**.]{.underline} Each row represent a different flight departing from New York City.
 
 ## Exercise 2
 
 **Your turn:** What are the names of the variables in `flights`.
 
 ```{r}
-#| label: column-names
 
-# add code here
+colnames(flights)
+
 ```
 
 ## Exercise 3 - `select()`
@@ -32,33 +34,31 @@ Each row represents a \_\_\_.
 -   Make a data frame that only contains the variables `dep_delay` and `arr_delay`.
 
 ```{r}
-#| label: select-vars
 
-# add code here
+deparr_delay <- select(flights, c(dep_delay, arr_delay))
 ```
 
 -   Make a data frame that keeps every variable except `dep_delay`.
 
 ```{r}
-#| label: exclude-vars
 
-# add code here
+flight_3b <- select(flights, c(1:5,7:19))
 ```
 
 -   Make a data frame that includes all variables between `year` through `dep_delay` (inclusive). These are all variables that provide information about the departure of each flight.
 
 ```{r}
-#| label: include-range
 
-# add code here
+flight_3c <- select(flights, c(1:6))
+
 ```
 
 -   Use the `select` helper `contains()` to make a data frame that includes the variables associated with the arrival, i.e., contains the string `"arr\_"` in the name.
 
 ```{r}
-#| label: arr-vars
 
-# add code here
+flights_3d <- flights %>% select(contains("arr"))
+
 ```
 
 ## Exercise 4 - `slice()`
@@ -68,7 +68,8 @@ Each row represents a \_\_\_.
 ```{r}
 #| label: slice
 
-# add code here
+f4a <- slice(flights, 1:5)
+
 ```
 
 -   Display the last two rows of the `flights` data frame.
@@ -76,7 +77,8 @@ Each row represents a \_\_\_.
 ```{r}
 #| label: last-two
 
-# add code here
+tail(flights, 2)
+
 ```
 
 ## Exercise 5 - `arrange()`
@@ -86,7 +88,8 @@ Each row represents a \_\_\_.
 ```{r}
 #| label: arrange-delays
 
-# add code here
+flights_5a <- arrange(flights, dep_delay)
+
 ```
 
 -   Question: What does it mean for the `dep_delay` to have a negative value?
@@ -98,7 +101,8 @@ Add your response here.
 ```{r}
 #| label: arrange-delays-desc
 
-# add code here
+flights_5b <- arrange(flights, desc(dep_delay))
+
 ```
 
 -   **Your turn:** Create a data frame that only includes the plane tail number (`tailnum`), carrier (`carrier`), and departure delay for the flight with the longest departure delay. What is the plane tail number (`tailnum`) for this flight?
@@ -106,7 +110,10 @@ Add your response here.
 ```{r}
 #| label: longest-delay
 
-# add code here
+flights_5c <- flights %>%
+  mutate(across(c(tailnum, carrier))) %>%
+  arrange(desc(dep_delay)) %>% 
+  select(tailnum, carrier)
 ```
 
 ## Exercise 6 - `filter()`
@@ -116,7 +123,7 @@ Add your response here.
 ```{r}
 #| label: rdu
 
-# add code here
+flights_6a <- filter(flights, dest == "RDU")
 ```
 
 -   Filter for all rows where the destination airport is RDU and the arrival delay is less than 0.
@@ -124,21 +131,18 @@ Add your response here.
 ```{r}
 #| label: rdu-ontime
 
-# add code here
+flights_6b <- flights %>%
+  filter(dest == "RDU" | arr_delay < "0")
 ```
 
 -   **Your turn:** Describe what the code is doing in words.
 
-Add response here.
+The code below is used to filter for destinations going to RDU and GSO in the flight dataset, while not creating a new datafame. The code is also filtering any delays to arrivals and departures to be less then 0.
 
 ```{r}
 #| label: nc-early
 
-flights |>
-  filter(
-    dest %in% c("RDU", "GSO"),
-    arr_delay < 0 | dep_delay < 0
-  )
+flights |>  filter(dest %in% c("RDU", "GSO"), arr_delay < 0 | dep_delay < 0)
 ```
 
 **Hint:** Logical operators in R:
@@ -166,7 +170,11 @@ flights |>
 ```{r}
 #| label: count-dest
 
-# add code here
+flights_7a <-filter(flights, origin == "JFK" | origin == "LGA")
+flights_7a
+
+freqtable7a <- count(flights_7a, flights_7a$dest)
+print(freqtable7a)
 ```
 
 -   In which month was there the fewest number of flights? How many flights were there in that month?
@@ -174,41 +182,54 @@ flights |>
 ```{r}
 #| label: count-month
 
-# add code here
+freqtable7b <- count(flights,flights$month)
+print(freqtable7b)
 ```
 
 -   **Your turn:** On which date (month + day) was there the largest number of flights? How many flights were there on that day?
+-   November 27th had the most flights departing with 1,014
 
 ```{r}
 #| label: count-date
 
-# add code here
+freqtable7c <- count(flights,flights$month, flights$day) 
+print(freqtable7c)
+max(freqtable7c)
+view(freqtable7c)
 ```
 
 ## Exercise 8 - `mutate()`
 
 -   Convert `air_time` (minutes in the air) to hours and then create a new variable, `mph`, the miles per hour of the flight.
 
-```{r}
+```{r 8a}
 #| label: calculate-mph
 
-# add code here
+flight8a <- flights %>%
+  mutate(air_time = air_time/60)
+mph <- c(flight8a$distance/flight8a$air_time)
+
+flight8a$mph <- flight8a
+
 ```
 
 -   **Your turn:** First, count the number of flights each month, and then calculate the proportion of flights in each month. What proportion of flights take place in July?
 
-```{r}
+```{r 8b}
 #| label: months-prop
 
-# add code here
+
+
 ```
 
 -   Create a new variable, `rdu_bound`, which indicates whether the flight is to RDU or not. Then, for each departure airport (`origin`), calculate what proportion of flights originating from that airport are to RDU.
 
-```{r}
+```{r 8c}
 #| label: rdu-origin-prop
 
-# add code here
+flight8c <- flights
+flight8c$rdu_bound <- flight8c 
+flight8c <- mutate(flight8c, rdu_bound = if_else(dest == "RDU", "Yes", "No"))
 ```
 
 ## Exercise 9 - `summarize()`
