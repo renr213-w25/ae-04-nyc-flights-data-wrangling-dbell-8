@@ -43,6 +43,8 @@ head(flights, 5)
 tail(flights, 2)
 flights
 
+view(flights)
+
 #5
 flights_5a <- arrange(flights, dep_delay)
 flights_5a
@@ -66,6 +68,53 @@ flights_6b <- flights %>%
 flights_6b
 
 #7
-flights_7a <-filter(flights, origin == "JFK" | origin == "LGA") %>%
-  freq_table
+
+flights_7a <-filter(flights, origin == "JFK" | origin == "LGA")
 flights_7a
+
+freqtable7a <- count(flights_7a, flights_7a$dest)
+print(freqtable7a)
+
+#####################
+
+freqtable7b <- count(flights,flights$month)
+print(freqtable7b)
+#####################
+
+freqtable7c <- count(flights,flights$month, flights$day) 
+print(freqtable7c)
+max(freqtable7c)
+view(freqtable7c)
+
+#8
+flight8a <- flights %>%
+  mutate(air_time = air_time/60)
+mph <- c(flight8a$distance/flight8a$air_time)
+
+flight8a$mph <- flight8a
+
+flight8a
+view(flight8a$mph)
+colnames(flight8a)
+
+
+#8b
+count8b <- count(flights,flights$month)
+month <- c("1","2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12")
+flightfreq <- count8b %>%
+  table(month)
+flightprop8b <- prop.table(flightfreq)
+print(flightprop8b)
+
+
+#8c
+flight8c <- flights
+flight8c$rdu_bound <- flight8c 
+flight8c <- mutate(flight8c, rdu_bound = if_else(dest == "RDU", "Yes", "No"))
+
+flight8c
+print(flight8c)
+
+#9 Mean
+flight9 <- flights %>%
+  summarise(flights$arr_delay)

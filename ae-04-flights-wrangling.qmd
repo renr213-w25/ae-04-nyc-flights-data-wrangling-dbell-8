@@ -137,16 +137,12 @@ flights_6b <- flights %>%
 
 -   **Your turn:** Describe what the code is doing in words.
 
-Add response here.
+The code below is used to filter for destinations going to RDU and GSO in the flight dataset, while not creating a new datafame. The code is also filtering any delays to arrivals and departures to be less then 0.
 
 ```{r}
 #| label: nc-early
 
-flights |>
-  filter(
-    dest %in% c("RDU", "GSO"),
-    arr_delay < 0 | dep_delay < 0
-  )
+flights |>  filter(dest %in% c("RDU", "GSO"), arr_delay < 0 | dep_delay < 0)
 ```
 
 **Hint:** Logical operators in R:
@@ -174,7 +170,11 @@ flights |>
 ```{r}
 #| label: count-dest
 
-# add code here
+flights_7a <-filter(flights, origin == "JFK" | origin == "LGA")
+flights_7a
+
+freqtable7a <- count(flights_7a, flights_7a$dest)
+print(freqtable7a)
 ```
 
 -   In which month was there the fewest number of flights? How many flights were there in that month?
@@ -182,41 +182,54 @@ flights |>
 ```{r}
 #| label: count-month
 
-# add code here
+freqtable7b <- count(flights,flights$month)
+print(freqtable7b)
 ```
 
 -   **Your turn:** On which date (month + day) was there the largest number of flights? How many flights were there on that day?
+-   November 27th had the most flights departing with 1,014
 
 ```{r}
 #| label: count-date
 
-# add code here
+freqtable7c <- count(flights,flights$month, flights$day) 
+print(freqtable7c)
+max(freqtable7c)
+view(freqtable7c)
 ```
 
 ## Exercise 8 - `mutate()`
 
 -   Convert `air_time` (minutes in the air) to hours and then create a new variable, `mph`, the miles per hour of the flight.
 
-```{r}
+```{r 8a}
 #| label: calculate-mph
 
-# add code here
+flight8a <- flights %>%
+  mutate(air_time = air_time/60)
+mph <- c(flight8a$distance/flight8a$air_time)
+
+flight8a$mph <- flight8a
+
 ```
 
 -   **Your turn:** First, count the number of flights each month, and then calculate the proportion of flights in each month. What proportion of flights take place in July?
 
-```{r}
+```{r 8b}
 #| label: months-prop
 
-# add code here
+
+
 ```
 
 -   Create a new variable, `rdu_bound`, which indicates whether the flight is to RDU or not. Then, for each departure airport (`origin`), calculate what proportion of flights originating from that airport are to RDU.
 
-```{r}
+```{r 8c}
 #| label: rdu-origin-prop
 
-# add code here
+flight8c <- flights
+flight8c$rdu_bound <- flight8c 
+flight8c <- mutate(flight8c, rdu_bound = if_else(dest == "RDU", "Yes", "No"))
 ```
 
 ## Exercise 9 - `summarize()`
